@@ -1,58 +1,89 @@
-import csv
-import random
-import os
+# 파이썬 기초 복습 퀴즈
 
-# Configuration
-NUM_CLASSES = 3
-STUDENTS_PER_CLASS = 20
-OUTPUT_FILE = 'student_scores.csv'
+방금 학습한 5가지 코드 예제를 바탕으로 한 퀴즈입니다. 
+문제를 풀어보고 맨 아래 정답과 비교해 보세요!
 
-# Korean Name Components
-surnames = ['김', '이', '박', '최', '정', '강', '조', '윤', '장', '임', '한', '오', '서', '신', '권', '황', '안', '송', '전', '홍']
-first_names = ['민준', '서준', '도윤', '예준', '시우', '하준', '지호', '주원', '지우', '이안', 
-               '서연', '서현', '지우', '서윤', '하은', '민서', '지유', '윤서', '채원', '지민',
-               '준우', '현우', '다은', '수아', '나연', '예은', '지현', '지원', '혜진', '동현']
+---
 
-def generate_name():
-    return random.choice(surnames) + random.choice(first_names)
+## 1. 변수와 입출력
+**문제 1)** 사용자에게 입력을 받기 위해 사용하는 파이썬 함수는 무엇인가요?
+1. `print()`
+2. `input()`
+3. `write()`
+4. `scan()`
 
-def generate_data():
-    data = []
-    headers = ['분반', '번호', '이름', '문항1(20점)', '문항2(20점)', '문항3(20점)', '문항4(20점)', '문항5(20점)', '총점']
-    
-    for class_num in range(1, NUM_CLASSES + 1):
-        for student_num in range(1, STUDENTS_PER_CLASS + 1):
-            scores = []
-            for _ in range(5):
-                # Generate a score between 10 and 20, weighted towards higher scores for realism
-                score = random.randint(10, 20)
-                scores.append(score)
-            
-            total_score = sum(scores)
-            name = generate_name()
-            
-            row = [
-                f"{class_num}반",
-                student_num,
-                name,
-                scores[0],
-                scores[1],
-                scores[2],
-                scores[3],
-                scores[4],
-                total_score
-            ]
-            data.append(row)
-            
-    return headers, data
+**문제 2)** `input()` 함수로 입력받은 데이터의 기본 자료형(Type)은 무엇일까요?
+1. 정수(int)
+2. 실수(float)
+3. 문자열(str)
+4. 리스트(list)
 
-def save_to_csv(headers, data):
-    with open(OUTPUT_FILE, 'w', newline='', encoding='utf-8-sig') as f:
-        writer = csv.writer(f)
-        writer.writerow(headers)
-        writer.writerows(data)
-    print(f"Successfully generated {len(data)} student records to {os.path.abspath(OUTPUT_FILE)}")
+---
 
-if __name__ == "__main__":
-    headers, data = generate_data()
-    save_to_csv(headers, data)
+## 2. 조건문 (if/else)
+**문제 3)** 다음 코드의 실행 결과로 올바른 것은?
+```python
+number = 10
+if number % 3 == 0:
+    print("A")
+else:
+    print("B")
+```
+1. A
+2. B
+3. A B 둘 다 출력
+4. 오류 발생
+
+---
+
+## 3. 반복문 (for)
+**문제 4)** `range(1, 5)`가 생성하는 숫자의 범위로 올바른 것은?
+1. 1, 2, 3, 4, 5
+2. 1, 2, 3, 4
+3. 0, 1, 2, 3, 4
+4. 2, 3, 4, 5
+
+---
+
+## 4. 리스트 (List)
+**문제 5)** `scores = [10, 20, 30]` 리스트가 있을 때, `len(scores)`의 값은 무엇인가요?
+1. 2
+2. 3
+3. 10
+4. 30
+
+---
+
+## 5. 함수 (Function)
+**문제 6)** 파이썬에서 새로운 함수를 정의할 때 사용하는 키워드는 무엇인가요?
+1. `func`
+2. `function`
+3. `define`
+4. `def`
+
+---
+<br>
+<br>
+<br>
+<br>
+<br>
+
+# 정답 및 풀이
+
+**1. 정답: 2번**  
+`input()`은 사용자 입력을 받는 함수이고, `print()`는 화면에 출력하는 함수입니다.
+
+**2. 정답: 3번**  
+`input()`으로 받은 데이터는 무조건 문자열(String) 형태입니다. 그래서 숫자 계산을 하려면 `int()` 등으로 변환해주어야 합니다.
+
+**3. 정답: 2번**  
+`10 % 3`은 10을 3으로 나눈 나머지이므로 `1`입니다. `1 == 0`은 거짓(False)이므로 `else` 블록인 "B"가 출력됩니다.
+
+**4. 정답: 2번**  
+`range(시작, 끝)`에서 '끝' 숫자는 포함되지 않습니다. 따라서 1 이상 5 미만인 `1, 2, 3, 4`가 생성됩니다.
+
+**5. 정답: 2번**  
+`len()` 함수는 리스트에 들어있는 아이템의 개수(길이)를 반환합니다. `[10, 20, 30]`은 3개이므로 3입니다.
+
+**6. 정답: 4번**  
+파이썬에서 함수를 만들 때는 `def 함수이름():` 형식을 사용합니다.
