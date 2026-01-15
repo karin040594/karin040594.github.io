@@ -1,144 +1,203 @@
-# 건축/인테리어 파이썬 코딩 예제 모음
+# 교육리더십 파이썬 코딩 예제 모음
 
-방금 작성했던 5가지 건축 실무 관련 파이썬 코드들입니다.
+방금 작성했던 5가지 교육리더십 및 행정 관련 파이썬 코드들입니다.
 
-## 1. 면적 단위 변환기 (arch_1_area_converter.py)
-제곱미터($m^2$)를 평 단위로 변환하는 기초적인 프로그램입니다.
+## 1. 리더십 스타일 자가 진단 (edu_1_leadership_style.py)
+변혁적 리더십(Transformational)과 거래적 리더십(Transactional) 문항을 통해 자신의 리더십 성향을 진단합니다.
 
 ```python
-# arch_1_area_converter.py
-# 건축 기초: 면적 단위 변환기 (제곱미터 -> 평)
+# edu_1_leadership_style.py
+# 리더십 유형 진단: 변혁적 리더십 vs 거래적 리더십
+# 각 항목에 대해 1~5점 점수를 입력받아 주된 리더십 스타일을 판별합니다.
 
-def m2_to_pyung(m2_area):
-    # 1 제곱미터 = 0.3025 평
-    pyung = m2_area * 0.3025
-    return pyung
+print("=== 리더십 스타일 자가 진단 (1: 전혀 아님 ~ 5: 매우 그렇다) ===")
 
-print("=== 면적 단위 변환기 ===")
-area_input = float(input("면적을 제곱미터(m²) 단위로 입력하세요: "))
+# 변혁적 리더십 (Transformational) 관련 문항
+t1 = int(input("1. 나는 구성원에게 비전을 제시하고 영감을 준다: "))
+t2 = int(input("2. 나는 구성원의 개인적 성장을 돕는다: "))
+trans_score = t1 + t2
 
-pyung_result = m2_to_pyung(area_input)
+# 거래적 리더십 (Transactional) 관련 문항
+c1 = int(input("3. 나는 성과에 대한 보상을 명확히 한다: "))
+c2 = int(input("4. 나는 규칙 위반 시 즉각 시정한다: "))
+transac_score = c1 + c2
 
-print(f"입력하신 {area_input}m²는 약 {pyung_result:.2f}평 입니다.")
+print("-" * 30)
+print(f"변혁적 리더십 점수: {trans_score}점")
+print(f"거래적 리더십 점수: {transac_score}점")
+print("-" * 30)
+
+if trans_score > transac_score:
+    print("당신은 '변혁적 리더십' 성향이 강합니다.")
+    print("구성원의 동기부여와 변화를 이끄는 데 강점이 있습니다.")
+elif transac_score > trans_score:
+    print("당신은 '거래적 리더십' 성향이 강합니다.")
+    print("조직의 안정적 운영과 성과 보상에 강점이 있습니다.")
+else:
+    print("두 가지 리더십 성향이 균형을 이루고 있습니다.")
 ```
 
 ---
 
-## 2. 타일 소요량 계산기 (arch_2_tile_calc.py)
-방 크기에 맞춰 바닥 타일이 몇 장 필요한지 계산하며, 자투리를 고려해 올림(`math.ceil`) 처리를 합니다.
+## 2. 동기부여 점수 계산기 (edu_2_motivation_calc.py)
+브룸(Vroom)의 기대이론(Expectancy Theory) 공식 `(M = E x I x V)`을 활용하여 교사의 동기부여 수준을 수치화합니다.
 
 ```python
-# arch_2_tile_calc.py
-# 타일 소요량 계산기 (올림 처리 포함)
-import math
+# edu_2_motivation_calc.py
+# 브룸(Vroom)의 기대이론(Expectancy Theory) 계산기
+# 동기(Motivation) = 기대감(E) x 수단성(I) x 유의성(V)
 
-print("=== 바닥 타일 계산기 ===")
+print("=== 교사 동기부여 계산기 (Vroom의 기대이론) ===")
 
-# 방의 크기 입력 (cm 단위)
-room_width = int(input("방의 가로 길이를 입력하세요(cm): "))
-room_height = int(input("방의 세로 길이를 입력하세요(cm): "))
+# 기대감 (Expectancy): 노력이 성과로 이어질 확률 (0.0 ~ 1.0)
+expectancy = float(input("기대감 (노력하면 성과를 낼 수 있는가? 0.0~1.0): "))
 
-# 타일 한 장의 크기 (30cm x 30cm 가정)
-tile_size = 30 
+# 수단성 (Instrumentality): 성과가 보상으로 이어질 확률 (0.0 ~ 1.0)
+instrumentality = float(input("수단성 (성과를 내면 보상을 받는가? 0.0~1.0): "))
 
-# 가로, 세로에 들어가는 타일 개수 계산 (여분을 위해 올림 처리)
-count_w = math.ceil(room_width / tile_size)
-count_h = math.ceil(room_height / tile_size)
+# 유의성 (Valence): 보상에 대한 개인적 가치 (-10 ~ +10)
+valence = int(input("유의성 (그 보상이 나에게 얼마나 가치 있는가? -10~10): "))
 
-total_tiles = count_w * count_h
+# 동기 점수 계산
+motivation = expectancy * instrumentality * valence
 
-print(f"가로 {count_w}장, 세로 {count_h}장이 필요합니다.")
-print(f"총 필요한 타일 개수: {total_tiles}장")
-# 파손 대비 여유분 10% 추가 안내
-print(f"(여유분 포함 권장 구매량: {math.ceil(total_tiles * 1.1)}장)")
+print(f"\n계산된 동기부여 점수: {motivation:.2f}점")
+
+if motivation > 5:
+    print("분석: 동기부여 수준이 매우 높습니다!")
+elif motivation > 0:
+    print("분석: 긍정적인 동기가 부여되어 있습니다.")
+elif motivation == 0:
+    print("분석: 동기가 전혀 없습니다. (어느 한 요인이 0임)")
+else:
+    print("분석: 역효과(부정적 동기)가 발생할 수 있습니다.")
 ```
 
 ---
 
-## 3. 원형 기둥 콘크리트 부피 (arch_3_concrete_vol.py)
-원기둥의 부피 공식($\pi r^2 h$)을 이용해 필요한 레미콘 양을 계산합니다.
+## 3. 의사결정 대안 평가 (edu_3_decision_matrix.py)
+합리적 의사결정 모형에 따라 비용과 영향력에 가중치를 두어 학교 개선 사업의 우선순위를 결정합니다.
 
 ```python
-# arch_3_concrete_vol.py
-# 원형 기둥 콘크리트 부피 계산하기
-import math
+# edu_3_decision_matrix.py
+# 합리적 의사결정 모형: 가중치 평가표
+# 여러 학교 개선 대안 중 가장 높은 점수를 받은 대안을 선택
 
-print("=== 원형 기둥 콘크리트 부피 계산 ===")
+# 평가 기준 가중치 설정 (총합 1.0)
+w_cost = 0.4      # 비용 효율성
+w_impact = 0.6    # 학생 영향력
 
-radius = float(input("기둥의 반지름(m)을 입력하세요: "))
-height = float(input("기둥의 높이(m)를 입력하세요: "))
-count = int(input("기둥의 개수를 입력하세요: "))
+def calculate_score(cost_score, impact_score):
+    return (cost_score * w_cost) + (impact_score * w_impact)
 
-# 원기둥 부피 공식 = 원주율 * 반지름^2 * 높이
-# math.pi를 사용하면 정확한 원주율을 쓸 수 있습니다.
-volume_one = math.pi * (radius ** 2) * height
-total_volume = volume_one * count
+# 대안 리스트 [대안명, 비용점수, 영향력점수]
+options = [
+    ["도서관 리모델링", 70, 90],
+    ["급식실 현대화", 80, 85],
+    ["스마트패드 보급", 60, 95]
+]
 
-print(f"기둥 1개의 부피: {volume_one:.2f}㎥")
-print(f"총 {count}개 기둥에 필요한 레미콘 부피: {total_volume:.2f}㎥")
+best_option = ""
+max_score = -1
+
+print("=== 학교 개선 사업 우선순위 결정 ===")
+print(f"가중치 -> 비용: {w_cost}, 영향력: {w_impact}")
+
+for opt in options:
+    name = opt[0]
+    score_c = opt[1]
+    score_i = opt[2]
+    
+    final_score = calculate_score(score_c, score_i)
+    print(f"- {name}: {final_score:.1f}점")
+    
+    if final_score > max_score:
+        max_score = final_score
+        best_option = name
+
+print("-" * 30)
+print(f"최종 결정: '{best_option}' 대안이 가장 적합합니다.")
 ```
 
 ---
 
-## 4. 벽돌 소요량 산출 (arch_4_brick_count.py)
-벽 전체 면적에서 창문 면적을 뺀(Net Area) 뒤 벽돌 소요량을 계산합니다.
+## 4. 갈등 해결 스타일 분석 (edu_4_conflict_mode.py)
+토마스-킬만(Thomas-Kilmann) 모델을 기반으로 독단성과 협조성 점수에 따라 갈등 관리 유형을 4가지로 분류합니다.
 
 ```python
-# arch_4_brick_cound.py
-# 벽면 조적(벽돌 쌓기) 수량 산출 (창문 면적 제외)
+# edu_4_conflict_mode.py
+# 토마스-킬만(Thomas-Kilmann) 갈등 관리 유형 분석
+# 자신의 주장을 관철하려는 '독단성'과 상대를 배려하는 '협조성' 두 축으로 판단
 
-print("=== 벽돌 소요량 계산 (창문 제외) ===")
+def check_conflict_mode(assertiveness, cooperativeness):
+    # 중앙값 기준 5점 (0~10점 척도 가정)
+    if assertiveness >= 5 and cooperativeness >= 5:
+        return "협력형 (Collaborating)"
+    elif assertiveness >= 5 and cooperativeness < 5:
+        return "경쟁형 (Competing)"
+    elif assertiveness < 5 and cooperativeness >= 5:
+        return "수용형 (Accommodating)"
+    else:
+        return "회피형 (Avoiding)"
+    # 타협형은 복잡하므로 여기서는 생략하거나 정중앙으로 간주
 
-# 벽 전체 크기
-wall_w = float(input("벽의 가로 길이(m): "))
-wall_h = float(input("벽의 세로 길이(m): "))
+print("=== 갈등 해결 스타일 분석 (0~10점) ===")
+my_assert = int(input("독단성 (내 주장을 얼마나 강하게 내세우는가?): "))
+my_coop = int(input("협조성 (상대방 의견을 얼마나 들어주는가?): "))
 
-# 창문 크기
-window_w = float(input("창문의 가로 길이(m): "))
-window_h = float(input("창문의 세로 길이(m): "))
-
-# 순수 벽돌 시공 면적 = 벽 면적 - 창문 면적
-net_wall_area = (wall_w * wall_h) - (window_w * window_h)
-
-# 1제곱미터당 벽돌 소요량 (표준 벽돌 0.5B 쌓기 기준 약 75장이라 가정)
-bricks_per_m2 = 75
-
-total_bricks = net_wall_area * bricks_per_m2
-
-print(f"시공해야 할 실제 벽 면적: {net_wall_area:.2f}m²")
-print(f"예상 소요 벽돌 수: 약 {int(total_bricks)}장")
-```
-
----
-
-## 5. 공사비 간편 견적 (arch_5_cost_est.py)
-자재 등급(고급/중급/보급)에 따라 평당 단가를 다르게 적용하여 총공사비를 계산합니다.
-
-```python
-# arch_5_cost_est.py
-# 건축 공사비 간편 견적서
-
-def calculate_cost(area_pyung, material_grade):
-    # 평당 공사비 단가 (단위: 만원)
-    if material_grade == "고급":
-        price_per_pyung = 800
-    elif material_grade == "중급":
-        price_per_pyung = 600
-    else: # 보급형
-        price_per_pyung = 450
+try:
+    if my_assert == 5 and my_coop == 5:
+        mode = "타협형 (Compromising)"
+    else:
+        mode = check_conflict_mode(my_assert, my_coop)
         
-    total_price = area_pyung * price_per_pyung
-    return total_price
+    print(f"당신의 갈등 해결 스타일은 '{mode}' 입니다.")
 
-print("=== 간편 공사비 견적 시스템 ===")
-pyung = float(input("건축 연면적(평)을 입력하세요: "))
-grade = input("자재 등급을 입력하세요 (고급/중급/보급): ")
+except Exception as e:
+    print("올바른 숫자를 입력해주세요.")
+```
 
-estimated_cost = calculate_cost(pyung, grade)
+---
 
-print("----------------------------")
-print(f"면적: {pyung}평")
-print(f"등급: {grade}")
-print(f"예상 건축비: {estimated_cost:,.0f}만 원") # 1000단위 쉼표 표시
-print("----------------------------")
+## 5. 학교 예산 편성 시뮬레이션 (edu_5_budget_plan.py)
+총 예산에서 고정비를 제외한 가용 자원을 계산하고, 부서별 신청액이 초과될 경우 비율대로 삭감 조정하는 예산 행정 로직입니다.
+
+```python
+# edu_5_budget_plan.py
+# 단위학교 예산 편성 시뮬레이션
+# 총 예산에서 필수 고정비를 제외하고 자율 운영비를 분배
+
+total_budget = int(input("내년도 학교 총 예산(만원)을 입력하세요: "))
+
+# 고정비 (인건비, 시설유지비 등) - 전체의 약 70% 가정
+fixed_cost = int(total_budget * 0.7)
+avail_budget = total_budget - fixed_cost
+
+print(f"\n총 예산: {total_budget}만원")
+print(f"고정경비(예상): {fixed_cost}만원")
+print(f"가용 재원(자율 예산): {avail_budget}만원")
+print("-" * 30)
+
+# 부서별 예산 신청
+depts = ["교무기획부", "교육연구부", "생활안전부", "방과후학교부"]
+requests = {}
+total_req = 0
+
+print("각 부서별 예산 신청액을 입력받습니다.")
+for dept in depts:
+    amount = int(input(f"{dept} 신청액(만원): "))
+    requests[dept] = amount
+    total_req += amount
+
+print("-" * 30)
+if total_req <= avail_budget:
+    print(f"모든 부서의 예산 신청이 승인되었습니다. (잔액: {avail_budget - total_req}만원)")
+else:
+    print(f"예산 초과입니다! (초과액: {total_req - avail_budget}만원)")
+    print("일괄 삭감 비율을 적용하여 조정합니다...")
+    
+    ratio = avail_budget / total_req
+    for dept, amt in requests.items():
+        adjusted = int(amt * ratio)
+        print(f"{dept}: {amt} -> {adjusted}만원 (조정됨)")
 ```
