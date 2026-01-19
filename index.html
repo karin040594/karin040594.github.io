@@ -2,110 +2,118 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>전국 대학교 학과 검색</title>
+    <title>전국 대학교 학과 검색 시스템</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        body { font-family: 'Pretendard', sans-serif; padding: 20px; background: #f5f6fa; }
-        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h2 { color: #2c3e50; text-align: center; }
-        .search-box { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-        select, input { padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
-        button { padding: 10px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
-        th { background: #f8f9fa; color: #333; }
-        tr:hover { background: #f1f1f1; }
+        /* 깔끔한 홈페이지 스타일 */
+        body { font-family: 'Malgun Gothic', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .filter-group { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; border-bottom: 2px solid #eee; padding-bottom: 20px; }
+        select, input { flex: 1; min-width: 150px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        button { padding: 12px 25px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #0056b3; }
+        .status { margin-bottom: 10px; font-size: 14px; color: #666; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #007bff; color: white; padding: 15px; text-align: left; position: sticky; top: 0; }
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .no-result { text-align: center; padding: 50px; color: #999; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🎓 전국 대학교 검색 시스템</h2>
-    
-    <div class="search-box">
-        <select id="region">
-            <option value="">지역 선택 (전체)</option>
-        </select>
-        <select id="schoolType">
-            <option value="">학교 구분 (전체)</option>
-        </select>
-        <select id="establish">
-            <option value="">설립 구분 (전체)</option>
-            <option value="국/공립">국/공립</option>
-            <option value="사립">사립</option>
-        </select>
-        <button onclick="filterData()">검색하기</button>
+    <h2>🏫 대학교 학과 상세 검색</h2>
+    <p class="status">엑셀 파일을 선택하거나 검색 조건을 입력하세요.</p>
+
+    <div class="filter-group">
+        <input type="file" id="excelFile" accept=".csv, .xls, .xlsx" style="flex: 2;">
+        <select id="regionSelect"><option value="">지역(전체)</option></select>
+        <select id="typeSelect"><option value="">학교구분(전체)</option></select>
+        <input type="text" id="schoolInput" placeholder="학교명 입력">
+        <button onclick="applyFilter()">검색</button>
     </div>
 
-    <table id="resultTable">
-        <thead>
-            <tr>
-                <th>지역</th>
-                <th>학교명</th>
-                <th>구분</th>
-                <th>설립</th>
-                <th>학과명</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
+    <div id="countInfo" style="margin-bottom: 10px; font-weight: bold;"></div>
+
+    <div style="max-height: 600px; overflow-y: auto; border: 1px solid #ddd;">
+        <table>
+            <thead>
+                <tr>
+                    <th>시도명</th>
+                    <th>학교명</th>
+                    <th>학교구분</th>
+                    <th>학과명</th>
+                    <th>주야구분</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="5" class="no-result">데이터 파일을 업로드해 주세요.</td></tr>
             </tbody>
-    </table>
+        </table>
+    </div>
 </div>
 
 <script>
-    // 1. 엑셀 데이터를 JSON 형태로 변환하여 여기에 넣습니다.
-    // (보내주신 파일을 기반으로 샘플 데이터를 구성했습니다)
-    const universityData = [
-        { region: "서울", name: "서울대학교", type: "대학교", establish: "국/공립", major: "컴퓨터공학부" },
-        { region: "부산", name: "부산대학교", type: "대학교", establish: "국/공립", major: "기계공학부" },
-        { region: "경남", name: "연암공과대학교", type: "전문대학", establish: "사립", major: "스마트전기과" },
-        { region: "경기", name: "안산대학교", type: "전문대학", establish: "사립", major: "간호학과" }
-        // ... 여기에 실제 엑셀 데이터를 모두 넣을 수 있습니다.
-    ];
+    let rawData = []; // 전체 데이터 저장 변수
 
-    // 2. 셀렉트 박스 초기화 (중복 제거 후 지역/구분 채우기)
-    function init() {
-        const regions = [...new Set(universityData.map(item => item.region))];
-        const types = [...new Set(universityData.map(item => item.type))];
+    // 엑셀 파일 읽기 처리
+    document.getElementById('excelFile').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
         
-        const rSelect = document.getElementById('region');
-        const tSelect = document.getElementById('schoolType');
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, {type: 'array'});
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            rawData = XLSX.utils.sheet_to_json(firstSheet);
+            
+            // 필터 옵션 생성
+            setupFilters();
+            alert("데이터 로드 완료! 총 " + rawData.length + "건");
+        };
+        reader.readAsArrayBuffer(file);
+    });
+
+    function setupFilters() {
+        const regions = [...new Set(rawData.map(item => item.시도명))].filter(Boolean).sort();
+        const types = [...new Set(rawData.map(item => item.학교구분명))].filter(Boolean).sort();
+
+        const rSelect = document.getElementById('regionSelect');
+        const tSelect = document.getElementById('typeSelect');
 
         regions.forEach(r => rSelect.innerHTML += `<option value="${r}">${r}</option>`);
         types.forEach(t => tSelect.innerHTML += `<option value="${t}">${t}</option>`);
-        
-        filterData(); // 처음 실행 시 전체 데이터 표시
     }
 
-    // 3. 필터링 검색 함수
-    function filterData() {
-        const rVal = document.getElementById('region').value;
-        const tVal = document.getElementById('schoolType').value;
-        const eVal = document.getElementById('establish').value;
+    function applyFilter() {
+        const region = document.getElementById('regionSelect').value;
+        const type = document.getElementById('typeSelect').value;
+        const schoolName = document.getElementById('schoolInput').value.toLowerCase();
         const tbody = document.getElementById('tableBody');
         
-        tbody.innerHTML = '';
-
-        const filtered = universityData.filter(item => {
-            return (rVal === "" || item.region === rVal) &&
-                   (tVal === "" || item.type === tVal) &&
-                   (eVal === "" || item.establish === eVal);
+        const filtered = rawData.filter(item => {
+            return (!region || item.시도명 === region) &&
+                   (!type || item.학교구분명 === type) &&
+                   (!schoolName || String(item.학교명).toLowerCase().includes(schoolName));
         });
 
-        filtered.forEach(item => {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${item.region}</td>
-                    <td>${item.name}</td>
-                    <td>${item.type}</td>
-                    <td>${item.establish}</td>
-                    <td>${item.major}</td>
-                </tr>
-            `;
-        });
+        document.getElementById('countInfo').innerText = `검색 결과: ${filtered.length}건`;
+        
+        tbody.innerHTML = filtered.map(item => `
+            <tr>
+                <td>${item.시도명 || '-'}</td>
+                <td>${item.학교명 || '-'}</td>
+                <td>${item.학교구분명 || '-'}</td>
+                <td>${item.학과명 || '-'}</td>
+                <td>${item.주야과정명 || '-'}</td>
+            </tr>
+        `).join('');
+
+        if(filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="no-result">검색 결과가 없습니다.</td></tr>';
+        }
     }
-
-    init();
 </script>
 
 </body>
